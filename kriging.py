@@ -24,23 +24,7 @@ for data in iii:
     with open(f'kriging_{data}.pkl','rb') as f:
         k_trained = pkl.load(f)
 
-    
-
-
-    
     k_pred = [k_trained.predict(x_) for x_ in x_test]
-
-
-
-
-
-
-
-
-
-
-
-
 
     FEM_23z =  df_train['23z']
 
@@ -54,36 +38,7 @@ for data in iii:
 
     mean_error
 
-
-
-
-
-
     np.savetxt(f"predict_{data}.csv",k_pred,delimiter=',')
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 # %%
@@ -100,10 +55,12 @@ x_test=np.column_stack((test_Act,test_T))
 with open(f'C:/Users/DL/Desktop/新出图/fig14/1000/y_9to10_150_5inp_kriging.pkl','rb') as f:
     k_trained = pkl.load(f)
 
-%time   k_pred = [k_trained.predict(x_) for x_ in x_test]
+#%%
+%% time
+k_pred = [k_trained.predict(x_) for x_ in x_test]
 
 np.savetxt(f"kriging查看离散性的对角线_y.csv",k_pred,delimiter=',')
-                         # %%
+
 
 
 

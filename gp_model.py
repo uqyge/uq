@@ -59,7 +59,6 @@ for i in trials:
     # gp = george.GP(kernel,solver=george.HODLRSolver,seed=42)
     gp = george.GP(kernel)
     gp.compute(x)
-    # gp.compute(x[:100])
 
     pred, pred_var = gp.predict(y, x_pred, return_var=True)
     r2_pred = r2_score(df_pred[output_label], pred)
@@ -74,8 +73,6 @@ for i in trials:
     # print(f"Initial log-likelihood:{gp.log_likelihood(y)}")
 
     def neg_ln_like(p):
-        # p = np.log(p)
-        # p0 = np.exp(p)
         gp.set_parameter_vector(p)
         ll = gp.log_likelihood(y, quiet=True)
         return -ll if np.isfinite(ll) else 1e25
@@ -139,15 +136,10 @@ pred, pred_var = gps[df_coeff.idxmax()["likelihood_opt"]].predict(
 plt.plot(df_pred[output_label], pred, "d")
 plt.title(f"r2={r2_score(df_pred[output_label], pred)}")
 
-# %%
 # %%time
 pred, pred_var = gps[df_coeff.idxmax()["likelihood"]].predict(
     y, x_pred, return_var=True
 )
-# %%
-
-
-# %%
 
 
 # %%
