@@ -4,5 +4,5 @@
 *.xlsx 
 *.parquet
 .vscode/
-
+saved_model/
 
