@@ -10,7 +10,10 @@ from sklearn.preprocessing import MinMaxScaler, StandardScaler
 from tensorflow.keras.layers.experimental import preprocessing
 
 # %%
-df_train = pd.read_csv("./data/0_10.csv")
+f_name= "./data/0_10.csv"
+m_name = f_name.split('/')[-1].split('.')[0]
+df_train = pd.read_csv(f_name)
+
 # df_train = pd.read_parquet("./no_g_handpick.parquet")
 # df_train = pd.read_parquet("./quanshaixuan.parquet")
 # %%
@@ -36,7 +39,7 @@ x_train, x_test, y_train, y_test = train_test_split(
     x, y, test_size=0.1, random_state=42
 )
 
-with open("models/minMax_quanshaixuan.pkl", "wb") as f:
+with open(f"models/{m_name}_minMax.pkl", "wb") as f:
     pickle.dump((input_scaler, output_scaler), f)
 
 rescaler_in = preprocessing.Rescaling(
@@ -57,7 +60,6 @@ rescaler_in.adapt(X)
 # %%
 model = tf.keras.Sequential()
 # model.add(tf.keras.layers.Dense(units=50, activation="relu", input_dim=x.shape[1]))
-
 model.add(rescaler_in)
 model.add(tf.keras.layers.Dense(units=50, activation="relu"))
 model.add(tf.keras.layers.Dense(units=50, activation="relu"))
@@ -101,14 +103,16 @@ history = model.fit(
     callbacks=[callback_early, callback_rate],
     batch_size=256,
 )
-
+#%%
 model.evaluate(x_test, y_test)
 #%%
-model_name = '0-10'
-model.save("models/act_abbc_nn_quanshaixuan.h5")
-tf.saved_model.save(model, "saved_model/my_model")
+model.save(f"models/nn_{m_name}.h5")
+
 #%%
-!python -m tf2onnx.convert --saved-model ./saved_model/my_model --opset 13 --output {model_name}.onnx
+tf.saved_model.save(model, f"saved_model/{m_name}")
+!python -m tf2onnx.convert --saved-model ./saved_model/{m_name} --opset 13 --output ./models/{m_name}.onnx
+
+
 # %%
 y_predict = model.predict(x_test, batch_size=1024)
 df_predict = pd.DataFrame(output_scaler.inverse_transform(y_predict), columns=y_label)
