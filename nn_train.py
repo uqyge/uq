@@ -2,6 +2,7 @@
 import pickle
 
 import matplotlib.pyplot as plt
+import numpy as np
 import pandas as pd
 import tensorflow as tf
 from sklearn.metrics import r2_score
@@ -10,9 +11,11 @@ from sklearn.preprocessing import MinMaxScaler, StandardScaler
 from tensorflow.keras.layers.experimental import preprocessing
 
 # %%
-f_name= "./data/0_10.csv"
+# f_name= "./data/0_10.parquet"
+f_name= "./data/最终.parquet"
 m_name = f_name.split('/')[-1].split('.')[0]
-df_train = pd.read_csv(f_name)
+# df_train = pd.read_csv(f_name)
+df_train = pd.read_parquet(f_name)
 
 # df_train = pd.read_parquet("./no_g_handpick.parquet")
 # df_train = pd.read_parquet("./quanshaixuan.parquet")
@@ -20,8 +23,8 @@ df_train = pd.read_csv(f_name)
 x_label = ["A1", "A2", "A4"]
 X = df_train[x_label]
 
-y_label = ["23x", "23y", "23z"]
-# y_label = ["30", "ave18_23y", "ave18_23z"]
+# y_label = ["23x", "23y", "23z"]
+y_label = ["30", "ave18_23y", "ave18_23z"]
 Y = df_train[y_label]
 
 input_scaler = MinMaxScaler()
@@ -44,9 +47,9 @@ with open(f"models/{m_name}_minMax.pkl", "wb") as f:
 
 rescaler_in = preprocessing.Rescaling(
     1 / (X.max() - X.min()).to_numpy(),
-    input_shape=[
-        1,
-    ],
+    # input_shape=[3,]
+    # axis=-1
+    input_dim=x.shape[1]
 )
 rescaler_in.adapt(X)
 
@@ -67,6 +70,10 @@ model.add(tf.keras.layers.Dense(units=50, activation="relu"))
 model.add(tf.keras.layers.Dense(units=y.shape[1]))
 # model.add(rescaler_out)
 model.summary()
+
+
+#%%
+output_scaler.inverse_transform(model.predict(np.asarray([0.3,0.3,0.3]).reshape(1,-1)))
 
 #%%
 def scheduler(epoch, lr):
