@@ -70,16 +70,17 @@ def sqp_post(sols, fname):
         data, columns=["success", "nfev", "A1", "A23", "A4", "31", "23y", "23z", "opt"]
     )
     df_opt_sqp["method"] = "sqp"
-    x = [
-        df_opt_sqp[df_opt_sqp.success == True].nfev[: i + 1].sum()
-        for i in range(df_opt_sqp[df_opt_sqp.success == True].shape[0])
+
+    df_conv = df_opt_sqp[df_opt_sqp.success == True]
+    res = [
+        [df_conv.nfev[: i + 1].sum(), df_conv.opt[: i + 1].max()]
+        for i in range(df_conv.shape[0])
     ]
-    y = [
-        df_opt_sqp[df_opt_sqp.success == True].opt[: i + 1].max()
-        for i in range(df_opt_sqp[df_opt_sqp.success == True].shape[0])
-    ]
-    np.savetxt(f"output/sqp_{fname}.csv", np.vstack([x, y]), delimiter=",")
-    convergence_plot(x, y, "sqp_" + fname)
+    convergence_plot(res[:, 0], res[:, 1], "sqp_" + fname)
+    pd.DataFrame(np.asarray(res), columns=["iterations", "max"]).to_csv(
+        f"outputs/sqp_{fname}.csv", index=False
+    )
+
     return df_opt_sqp
 
 
@@ -165,4 +166,3 @@ df_opt_sqp.sort_values("23z", ascending=False)
 # %%
 ortRun(np.asarray([0.3, 0.3, 0.173]).reshape(1, -1).astype(np.float32))
 # %%
-
